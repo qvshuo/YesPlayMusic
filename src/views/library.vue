@@ -24,7 +24,7 @@
               {{ liked.songs.length }} {{ $t('common.songs') }}
             </div>
           </div>
-          <button @click.stop="playLikedSongs">
+          <button @click.stop="openPlayModeTabMenu">
             <svg-icon icon-class="play" />
           </button>
         </div>
@@ -87,6 +87,13 @@
           >
             云盘
           </div>
+          <div
+            class="tab"
+            :class="{ active: currentTab === 'playHistory' }"
+            @click="updateCurrentTab('playHistory')"
+          >
+            听歌排行
+          </div>
         </div>
         <button
           v-show="currentTab === 'playlists'"
@@ -144,6 +151,20 @@
           :extra-context-menu-item="['removeTrackFromCloudDisk']"
         />
       </div>
+
+      <div v-show="currentTab === 'playHistory'">
+        <button class="playHistory-button" @click="playHistoryMode = 'week'">
+          最近一周
+        </button>
+        <button class="playHistory-button" @click="playHistoryMode = 'all'">
+          所有時間
+        </button>
+        <TrackList
+          :tracks="playHistoryList"
+          :column-number="1"
+          type="tracklist"
+        />
+      </div>
     </div>
 
     <input
@@ -164,6 +185,14 @@
       <div class="item" @click="changePlaylistFilter('liked')">{{
         $t('contextMenu.likedPlaylists')
       }}</div>
+    </ContextMenu>
+
+    <ContextMenu ref="playModeTabMenu">
+      <div class="item" @click="playLikedSongs">{{
+        $t('library.likedSongs')
+      }}</div>
+      <hr />
+      <div class="item" @click="playIntelligenceList"> 心动模式 </div>
     </ContextMenu>
   </div>
 </template>
@@ -190,7 +219,7 @@ import MvRow from '@/components/MvRow.vue';
  * @returns {string} The lyric part
  */
 function extractLyricPart(rawLyric) {
-  return rawLyric.split(']')[1].trim();
+  return rawLyric.split(']').pop().trim();
 }
 
 export default {
@@ -202,6 +231,7 @@ export default {
       likedSongs: [],
       lyric: undefined,
       currentTab: 'playlists',
+      playHistoryMode: 'week',
     };
   },
   computed: {
@@ -245,6 +275,14 @@ export default {
       }
       return playlists;
     },
+    playHistoryList() {
+      if (this.show && this.playHistoryMode === 'week') {
+        return this.liked.playHistory.weekData;
+      } else if (this.show && this.playHistoryMode === 'all') {
+        return this.liked.playHistory.allData;
+      }
+      return [];
+    },
   },
   created() {
     setTimeout(() => {
@@ -279,9 +317,17 @@ export default {
       this.$store.dispatch('fetchLikedArtists');
       this.$store.dispatch('fetchLikedMVs');
       this.$store.dispatch('fetchCloudDisk');
+      this.$store.dispatch('fetchPlayHistory');
     },
     playLikedSongs() {
       this.$store.state.player.playPlaylistByID(
+        this.liked.playlists[0].id,
+        'first',
+        true
+      );
+    },
+    playIntelligenceList() {
+      this.$store.state.player.playIntelligenceListById(
         this.liked.playlists[0].id,
         'first',
         true
@@ -326,6 +372,9 @@ export default {
     },
     openPlaylistTabMenu(e) {
       this.$refs.playlistTabMenu.openMenu(e);
+    },
+    openPlayModeTabMenu(e) {
+      this.$refs.playModeTabMenu.openMenu(e);
     },
     changePlaylistFilter(type) {
       this.updateData({ key: 'libraryPlaylistFilter', value: type });
@@ -524,6 +573,19 @@ button.tab-button {
   &:active {
     opacity: 1;
     transform: scale(0.92);
+  }
+}
+
+button.playHistory-button {
+  color: var(--color-text);
+  border-radius: 8px;
+  padding: 10px;
+  transition: 0.2s;
+  opacity: 0.68;
+  font-weight: 500;
+  &:hover {
+    opacity: 1;
+    background: var(--color-secondary-bg);
   }
 }
 </style>
