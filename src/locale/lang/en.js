@@ -28,7 +28,14 @@ export default {
     albums: 'Albums',
     artists: 'Artists',
     mvs: 'MVs',
+    cloudDisk: 'Cloud Disk',
     newPlayList: 'New Playlist',
+    uploadSongs: 'Upload Songs',
+    playHistory: {
+      title: 'Play History',
+      week: 'Latest Week',
+      all: 'All Time',
+    },
     userProfileMenu: {
       settings: 'Settings',
       logout: 'Logout',
@@ -171,6 +178,34 @@ export default {
       exit: 'Exit',
       minimizeToTray: 'Minimize to tray',
     },
+    unm: {
+      enable: 'Enable',
+      audioSource: {
+        title: 'Audio Sources',
+      },
+      enableFlac: {
+        title: 'Enable FLAC Sources',
+        desc: 'To take effect, it may be required to clear the cache after enabling this function.',
+      },
+      searchMode: {
+        title: 'Audio Search Mode',
+        fast: 'Speed Priority',
+        order: 'Order Priority',
+      },
+      cookie: {
+        joox: 'Cookie for Joox use',
+        qq: 'Cookie for QQ use',
+        desc1: 'Click here for the configuration instruction. ',
+        desc2: 'Leave empty to pick up the default value',
+      },
+      ytdl: 'The youtube-dl Executable File for YtDl',
+      proxy: {
+        title: 'Proxy Server for UNM',
+        desc1:
+          'The proxy server to use for requesting services such as YouTube',
+        desc2: 'Leave empty to pick up the default value',
+      },
+    },
   },
   contextMenu: {
     play: 'Play',
@@ -186,6 +221,7 @@ export default {
     allPlaylists: 'All Playlists',
     minePlaylists: 'My Playlists',
     likedPlaylists: 'Liked Playlists',
+    cardiacMode: 'Cardiac Mode',
   },
   toast: {
     savedToPlaylist: 'Saved to playlist',

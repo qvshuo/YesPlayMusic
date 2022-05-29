@@ -1,9 +1,11 @@
 <template>
   <div v-show="show" ref="library">
     <h1>
-      <img class="avatar" :src="data.user.avatarUrl | resizeImage" />{{
-        data.user.nickname
-      }}{{ $t('library.sLibrary') }}
+      <img
+        class="avatar"
+        :src="data.user.avatarUrl | resizeImage"
+        loading="lazy"
+      />{{ data.user.nickname }}{{ $t('library.sLibrary') }}
     </h1>
     <div class="section-one">
       <div class="liked-songs" @click="goToLikedSongsList">
@@ -85,14 +87,14 @@
             :class="{ active: currentTab === 'cloudDisk' }"
             @click="updateCurrentTab('cloudDisk')"
           >
-            云盘
+            {{ $t('library.cloudDisk') }}
           </div>
           <div
             class="tab"
             :class="{ active: currentTab === 'playHistory' }"
             @click="updateCurrentTab('playHistory')"
           >
-            听歌排行
+            {{ $t('library.playHistory.title') }}
           </div>
         </div>
         <button
@@ -105,14 +107,14 @@
           v-show="currentTab === 'cloudDisk'"
           class="tab-button"
           @click="selectUploadFiles"
-          ><svg-icon icon-class="arrow-up-alt" /> 上传歌曲
+          ><svg-icon icon-class="arrow-up-alt" />{{ $t('library.uploadSongs') }}
         </button>
       </div>
 
       <div v-show="currentTab === 'playlists'">
         <div v-if="liked.playlists.length > 1">
           <CoverRow
-            :items="filterPlaylists.slice(1)"
+            :items="filterPlaylists"
             type="playlist"
             sub-text="creator"
             :show-play-button="true"
@@ -153,11 +155,23 @@
       </div>
 
       <div v-show="currentTab === 'playHistory'">
-        <button class="playHistory-button" @click="playHistoryMode = 'week'">
-          最近一周
+        <button
+          :class="{
+            'playHistory-button': true,
+            'playHistory-button--selected': playHistoryMode === 'week',
+          }"
+          @click="playHistoryMode = 'week'"
+        >
+          {{ $t('library.playHistory.week') }}
         </button>
-        <button class="playHistory-button" @click="playHistoryMode = 'all'">
-          所有時間
+        <button
+          :class="{
+            'playHistory-button': true,
+            'playHistory-button--selected': playHistoryMode === 'all',
+          }"
+          @click="playHistoryMode = 'all'"
+        >
+          {{ $t('library.playHistory.all') }}
         </button>
         <TrackList
           :tracks="playHistoryList"
@@ -192,7 +206,9 @@
         $t('library.likedSongs')
       }}</div>
       <hr />
-      <div class="item" @click="playIntelligenceList"> 心动模式 </div>
+      <div class="item" @click="playIntelligenceList">{{
+        $t('contextMenu.cardiacMode')
+      }}</div>
     </ContextMenu>
   </div>
 </template>
@@ -253,7 +269,7 @@ export default {
       // Pick 3 or fewer lyrics based on the lyric lines.
       const lyricsToPick = Math.min(lyricLine.length, 3);
 
-      // The upperbound of the lyric line to pick
+      // The upperBound of the lyric line to pick
       const randomUpperBound = lyricLine.length - lyricsToPick;
       const startLyricLineIndex = randomNum(0, randomUpperBound - 1);
 
@@ -266,7 +282,7 @@ export default {
       return this.data.libraryPlaylistFilter || 'all';
     },
     filterPlaylists() {
-      const playlists = this.liked.playlists;
+      const playlists = this.liked.playlists.slice(1);
       const userId = this.data.user.userId;
       if (this.playlistFilter === 'mine') {
         return playlists.filter(p => p.creator.userId === userId);
@@ -278,7 +294,8 @@ export default {
     playHistoryList() {
       if (this.show && this.playHistoryMode === 'week') {
         return this.liked.playHistory.weekData;
-      } else if (this.show && this.playHistoryMode === 'all') {
+      }
+      if (this.show && this.playHistoryMode === 'all') {
         return this.liked.playHistory.allData;
       }
       return [];
@@ -579,13 +596,29 @@ button.tab-button {
 button.playHistory-button {
   color: var(--color-text);
   border-radius: 8px;
-  padding: 10px;
+  padding: 6px 8px;
+  margin-bottom: 12px;
+  margin-right: 4px;
   transition: 0.2s;
   opacity: 0.68;
   font-weight: 500;
+  cursor: pointer;
   &:hover {
     opacity: 1;
     background: var(--color-secondary-bg);
+  }
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+button.playHistory-button--selected {
+  color: var(--color-text);
+  background: var(--color-secondary-bg);
+  opacity: 1;
+  font-weight: 700;
+  &:active {
+    transform: none;
   }
 }
 </style>
